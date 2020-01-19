@@ -32,7 +32,7 @@ from warehouse.accounts.services import (
     database_login_factory,
 )
 from warehouse.email import send_password_compromised_email_hibp
-from warehouse.errors import BasicAuthBreachedPassword
+from warehouse.errors import BasicAuthBreachedPassword, BasicAuthTwoFactorEnabled
 from warehouse.macaroons.auth_policy import (
     MacaroonAuthenticationPolicy,
     MacaroonAuthorizationPolicy,
@@ -72,6 +72,14 @@ def _basic_auth_login(username, password, request):
             # (since we wouldn't have fell through to them anyways).
             raise _format_exc_status(
                 BasicAuthBreachedPassword(), breach_service.failure_message_plain
+            )
+        elif login_service.has_two_factor(user.id):
+            raise _format_exc_status(
+                BasicAuthTwoFactorEnabled(),
+                (
+                    f"User {user.username} has two factor auth enabled, "
+                    "an API Token must be used to upload in place of password."
+                )
             )
         elif login_service.check_password(
             user.id, password, tags=["method:auth", "auth_method:basic"]
