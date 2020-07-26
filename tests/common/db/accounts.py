@@ -15,7 +15,7 @@ import datetime
 import factory
 import factory.fuzzy
 
-from warehouse.accounts.models import Email, User, UserEvent
+from warehouse.accounts.models import Email, User
 
 from .base import FuzzyEmail, WarehouseFactory
 
@@ -38,9 +38,9 @@ class UserFactory(WarehouseFactory):
 
 class UserEventFactory(WarehouseFactory):
     class Meta:
-        model = UserEvent
+        model = User.Event
 
-    user = factory.SubFactory(User)
+    source = factory.SubFactory(User)
 
 
 class EmailFactory(WarehouseFactory):

@@ -60,14 +60,7 @@ from warehouse.manage.forms import (
     ProvisionWebAuthnForm,
     SaveAccountForm,
 )
-from warehouse.packaging.models import (
-    File,
-    JournalEntry,
-    Project,
-    ProjectEvent,
-    Release,
-    Role,
-)
+from warehouse.packaging.models import File, JournalEntry, Project, Release, Role
 from warehouse.utils.http import is_safe_url
 from warehouse.utils.paginate import paginate_url_factory
 from warehouse.utils.project import confirm_project, destroy_docs, remove_project
@@ -1619,10 +1612,10 @@ def manage_project_history(project, request):
         raise HTTPBadRequest("'page' must be an integer.")
 
     events_query = (
-        request.db.query(ProjectEvent)
-        .join(ProjectEvent.project)
-        .filter(ProjectEvent.project_id == project.id)
-        .order_by(ProjectEvent.time.desc())
+        request.db.query(Project.Event)
+        .join(Project.Event.source)
+        .filter(Project.Event.source_id == project.id)
+        .order_by(Project.Event.time.desc())
     )
 
     events = SQLAlchemyORMPage(

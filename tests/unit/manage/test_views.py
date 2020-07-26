@@ -31,14 +31,7 @@ from warehouse.admin.flags import AdminFlagValue
 from warehouse.forklift.legacy import MAX_FILESIZE, MAX_PROJECT_SIZE
 from warehouse.macaroons.interfaces import IMacaroonService
 from warehouse.manage import views
-from warehouse.packaging.models import (
-    File,
-    JournalEntry,
-    Project,
-    ProjectEvent,
-    Role,
-    User,
-)
+from warehouse.packaging.models import File, JournalEntry, Project, Role, User
 from warehouse.utils.paginate import paginate_url_factory
 from warehouse.utils.project import remove_documentation
 
@@ -3769,13 +3762,13 @@ class TestManageProjectHistory:
     def test_get(self, db_request):
         project = ProjectFactory.create()
         older_event = ProjectEventFactory.create(
-            project=project,
+            source=project,
             tag="fake:event",
             ip_address="0.0.0.0",
             time=datetime.datetime(2017, 2, 5, 17, 18, 18, 462_634),
         )
         newer_event = ProjectEventFactory.create(
-            project=project,
+            source=project,
             tag="fake:event",
             ip_address="0.0.0.0",
             time=datetime.datetime(2018, 2, 5, 17, 18, 18, 462_634),
@@ -3819,13 +3812,13 @@ class TestManageProjectHistory:
         total_items = items_per_page + 2
         for _ in range(total_items):
             ProjectEventFactory.create(
-                project=project, tag="fake:event", ip_address="0.0.0.0"
+                source=project, tag="fake:event", ip_address="0.0.0.0"
             )
         events_query = (
-            db_request.db.query(ProjectEvent)
-            .join(ProjectEvent.project)
-            .filter(ProjectEvent.project_id == project.id)
-            .order_by(ProjectEvent.time.desc())
+            db_request.db.query(Project.Event)
+            .join(Project.Event.source)
+            .filter(Project.Event.source_id == project.id)
+            .order_by(Project.Event.time.desc())
         )
 
         events_page = SQLAlchemyORMPage(
@@ -3850,13 +3843,13 @@ class TestManageProjectHistory:
         total_items = items_per_page + 2
         for _ in range(total_items):
             ProjectEventFactory.create(
-                project=project, tag="fake:event", ip_address="0.0.0.0"
+                source=project, tag="fake:event", ip_address="0.0.0.0"
             )
         events_query = (
-            db_request.db.query(ProjectEvent)
-            .join(ProjectEvent.project)
-            .filter(ProjectEvent.project_id == project.id)
-            .order_by(ProjectEvent.time.desc())
+            db_request.db.query(Project.Event)
+            .join(Project.Event.source)
+            .filter(Project.Event.source_id == project.id)
+            .order_by(Project.Event.time.desc())
         )
 
         events_page = SQLAlchemyORMPage(
@@ -3881,7 +3874,7 @@ class TestManageProjectHistory:
         total_items = items_per_page + 2
         for _ in range(total_items):
             ProjectEventFactory.create(
-                project=project, tag="fake:event", ip_address="0.0.0.0"
+                source=project, tag="fake:event", ip_address="0.0.0.0"
             )
 
         with pytest.raises(HTTPNotFound):
