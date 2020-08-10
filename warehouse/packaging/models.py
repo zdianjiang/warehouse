@@ -481,7 +481,7 @@ class File(db.Model):
         ForeignKey("releases.id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
     )
-    python_version = Column(Text)
+    python_version = Column(Text, nullable=False)
     requires_python = Column(Text)
     packagetype = Column(
         Enum(
@@ -493,17 +493,20 @@ class File(db.Model):
             "bdist_wheel",
             "bdist_wininst",
             "sdist",
-        )
+        ),
+        nullable=False,
     )
-    comment_text = Column(Text)
-    filename = Column(Text, unique=True)
+    comment_text = Column(Text, nullable=False)
+    filename = Column(Text, unique=True, nullable=False)
     path = Column(Text, unique=True, nullable=False)
-    size = Column(Integer)
-    has_signature = Column(Boolean)
+    size = Column(Integer, nullable=False)
+    has_signature = Column(Boolean, nullable=False)
     md5_digest = Column(Text, unique=True, nullable=False)
     sha256_digest = Column(CIText, unique=True, nullable=False)
     blake2_256_digest = Column(CIText, unique=True, nullable=False)
-    upload_time = Column(DateTime(timezone=False), server_default=func.now())
+    upload_time = Column(
+        DateTime(timezone=False), server_default=func.now(), nullable=False
+    )
     uploaded_via = Column(Text)
 
     # We need this column to allow us to handle the currently existing "double"
